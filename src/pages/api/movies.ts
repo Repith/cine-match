@@ -1,7 +1,7 @@
 // Importujemy wymagane moduły
 import type { NextApiRequest, NextApiResponse } from 'next';
-import connectToDatabase from '@/backend/database/database';
-import Movie from '@/backend/models/Movie';
+import connectToDatabase from '@/backend/MongoConnection';
+import Movie from '@/backend/database/models/Movie';
 import tmdbService from '@/backend/services/tmdb.service';
 
 export default async function handler(
@@ -12,7 +12,7 @@ export default async function handler(
     await connectToDatabase();
 
     if (req.method === 'GET') {
-      const popularMovies = await tmdbService.getRecommendations();
+      const popularMovies = await tmdbService.getMoviesToSwipe();
 
       const savedMovies = await Movie.find();
       const savedMovieIds = savedMovies.map((movie) => movie.movieId);

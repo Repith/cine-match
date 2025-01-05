@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
-interface IUser extends Document {
+export interface UserDocument extends Document {
   email: string;
   password: string;
   likedMovies: string[];
@@ -14,4 +14,4 @@ const UserSchema: Schema = new Schema({
   dislikedMovies: [{ type: String }],
 });
 
-export default mongoose.model<IUser>('User', UserSchema);
+export default mongoose.model<UserDocument>('User', UserSchema);
