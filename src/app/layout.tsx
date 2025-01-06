@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import './globals.scss';
+import SessionProviderWrapper from '@/app/components/SessionProviderWrapper';
 
 const robotoFlex = localFont({
   src: './fonts/RobotoFlexVF.ttf',
@@ -26,7 +27,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${exo2.variable} ${robotoFlex.variable} antialiased`}>
-        {children}
+        <SessionProviderWrapper>{children}</SessionProviderWrapper>
       </body>
     </html>
   );

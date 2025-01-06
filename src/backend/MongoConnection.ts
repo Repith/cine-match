@@ -1,15 +1,20 @@
 import mongoose from 'mongoose';
 
-const connectToDatabase = async () => {
+const connectToMongo = async () => {
+  if (mongoose.connection.readyState === 1) {
+    console.log('Already connected to MongoDB');
+    return;
+  }
+
   try {
-    const connectionString =
-      process.env.MONGO_URI || 'mongodb://localhost:27017/cinematch';
-    await mongoose.connect(connectionString);
+    await mongoose.connect(process.env.MONGO_URI || '', {
+      serverSelectionTimeoutMS: 5000,
+    });
     console.log('Connected to MongoDB');
   } catch (error) {
     console.error('Error connecting to MongoDB:', error);
-    process.exit(1);
+    throw new Error('Failed to connect to MongoDB');
   }
 };
 
-export default connectToDatabase;
+export default connectToMongo;

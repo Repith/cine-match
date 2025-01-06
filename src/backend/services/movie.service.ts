@@ -29,18 +29,15 @@ const movieService = {
       ...(user?.dislikedMovies || []),
     ];
 
-    // Pobieramy filmy do swipowania
     let movies = await MovieRepository.getSwipeableMovies(
       excludedMovieIds,
       limit,
     );
 
-    // Jeśli nie ma wystarczającej liczby filmów, dociągamy nowe z TMDB
     if (movies.length < limit) {
       const additionalMovies = await tmdbService.getMoviesToSwipe(25);
       await this.saveMovies(additionalMovies);
 
-      // Pobieramy ponownie po zapisaniu nowych filmów
       movies = await MovieRepository.getSwipeableMovies(
         excludedMovieIds,
         limit,

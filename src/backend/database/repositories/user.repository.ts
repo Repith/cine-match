@@ -5,6 +5,15 @@ export const UserRepository = {
     return User.findById(userId).exec();
   },
 
+  async getByEmail(email: string): Promise<UserDocument | null> {
+    return User.findOne({ email }).exec();
+  },
+
+  async create(userData: Partial<UserDocument>): Promise<UserDocument> {
+    const user = new User(userData);
+    return user.save();
+  },
+
   async addLikedMovie(
     userId: string,
     movieId: string,
