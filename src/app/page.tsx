@@ -1,6 +1,8 @@
 'use client';
 
 import { useSession, signOut } from 'next-auth/react';
+import AppNavbar from '../components/layout/Navbar';
+import UserProfile from '../components/layout/UserProfile';
 
 const HomePage = () => {
   const { data: session, status } = useSession();
@@ -10,14 +12,16 @@ const HomePage = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
-      <header className="w-full bg-blue-500 text-white p-4 text-center">
-        <h1 className="text-3xl font-bold">CineMatch</h1>
+    <div className="min-h-screen flex flex-col">
+      {/* Main content */}
+      <main className="flex-grow flex flex-col items-center justify-center p-8 bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100">
+        <h1 className="text-4xl font-bold text-purple-600 dark:text-purple-400 mb-4">
+          CineMatch
+        </h1>
         {status === 'authenticated' ? (
-          <div className="mt-4">
+          <div className="text-center">
             <p>
-              Welcome,{' '}
-              <strong>{session.user?.email || session.user?.id}</strong>!
+              Welcome, <strong>{session.user?.username}</strong>!
             </p>
             <button
               onClick={() => signOut()}
@@ -29,12 +33,13 @@ const HomePage = () => {
         ) : (
           <p className="mt-4">You are not logged in.</p>
         )}
-      </header>
 
-      <main className="p-8 text-center">
-        <h2 className="text-xl font-semibold">
+        <UserProfile />
+
+        <h2 className="text-xl font-semibold mt-8">
           Start swiping your favorite movies!
         </h2>
+
         <p className="mt-4">Log in to discover more.</p>
       </main>
     </div>

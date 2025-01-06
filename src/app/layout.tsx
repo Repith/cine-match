@@ -1,7 +1,11 @@
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import './globals.scss';
-import SessionProviderWrapper from '@/app/components/SessionProviderWrapper';
+import { Toaster } from '@/components/ui/toaster';
+import Navbar from '@/components/layout/Navbar';
+import { ThemeProvider } from '@/components/providers/ThemeProvider';
+import SessionProviderWrapper from '@/components/providers/SessionProviderWrapper';
+import QueryProvider from '@/components/providers/QueryProvider';
 
 const robotoFlex = localFont({
   src: './fonts/RobotoFlexVF.ttf',
@@ -21,13 +25,24 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="en">
-      <body className={`${exo2.variable} ${robotoFlex.variable} antialiased`}>
-        <SessionProviderWrapper>{children}</SessionProviderWrapper>
+    <html lang="en" suppressHydrationWarning>
+      <body
+        className={`${exo2.variable} ${robotoFlex.variable} antialiased`}
+        suppressHydrationWarning
+      >
+        <QueryProvider>
+          <ThemeProvider defaultTheme="system" enableSystem>
+            <SessionProviderWrapper>
+              <Navbar />
+              {children}
+            </SessionProviderWrapper>
+          </ThemeProvider>
+        </QueryProvider>
+        <Toaster />
       </body>
     </html>
   );

@@ -2,8 +2,9 @@ import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcrypt';
 import { UserRepository } from '@/backend/database/repositories/user.repository';
+import connectToDatabase from '@/backend/MongoConnection';
 
-export default NextAuth({
+const handler = NextAuth({
   providers: [
     CredentialsProvider({
       name: 'Credentials',
@@ -11,13 +12,15 @@ export default NextAuth({
         email: { label: 'Email', type: 'text' },
         password: { label: 'Password', type: 'password' },
       },
-
       async authorize(credentials) {
-        if (!credentials) {
-          console.error('No credentials provided');
-          return null;
+        await connectToDatabase();
+        if (!credentials || !credentials.email || !credentials.password) {
+          throw new Error('Invalid credentials');
         }
-        const user = await UserRepository.getByEmail(credentials.email);
+
+        const user = await UserRepository.getByEmailOrUsername(
+          credentials.email,
+        );
         if (!user) {
           throw new Error('No user found');
         }
@@ -26,12 +29,15 @@ export default NextAuth({
           credentials.password,
           user.password,
         );
-
         if (!isValidPassword) {
           throw new Error('Invalid password');
         }
 
-        return { id: user._id.toString(), email: user.email };
+        return {
+          id: user._id?.toString() ?? 'Unknown User ID',
+          username: user.username ?? 'Unknown Username',
+          email: user.email ?? 'Unknown Email',
+        };
       },
     }),
   ],
@@ -43,14 +49,16 @@ export default NextAuth({
       if (user) {
         token.id = user.id;
         token.email = user.email;
+        token.username = user.username;
       }
       return token;
     },
     async session({ session, token }) {
       if (token) {
         session.user = {
-          id: token.id,
-          email: token.email,
+          id: token.id as string,
+          username: token.username as string,
+          email: token.email as string,
         };
       }
       return session;
@@ -58,3 +66,5 @@ export default NextAuth({
   },
   secret: process.env.NEXTAUTH_SECRET,
 });
+
+export { handler as GET, handler as POST };
