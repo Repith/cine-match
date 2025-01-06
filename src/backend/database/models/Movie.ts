@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Schema, Document, Model } from 'mongoose';
 
 export interface MovieDocument extends Document {
   movieId: string;
@@ -8,7 +8,7 @@ export interface MovieDocument extends Document {
   imageURL: string;
 }
 
-const MovieSchema = new Schema({
+const MovieSchema: Schema = new Schema({
   movieId: { type: String, required: true, unique: true },
   title: { type: String, required: true },
   summary: { type: String, required: true },
@@ -16,4 +16,7 @@ const MovieSchema = new Schema({
   imageURL: { type: String, required: true },
 });
 
-export default mongoose.model<MovieDocument>('Movie', MovieSchema);
+const Movie: Model<MovieDocument> =
+  mongoose.models.Movie || mongoose.model<MovieDocument>('Movie', MovieSchema);
+
+export default Movie;

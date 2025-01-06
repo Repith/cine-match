@@ -1,10 +1,10 @@
-import NextAuth from 'next-auth';
+import NextAuth, { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcrypt';
 import { UserRepository } from '@/backend/database/repositories/user.repository';
 import connectToDatabase from '@/backend/MongoConnection';
 
-const handler = NextAuth({
+export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: 'Credentials',
@@ -14,13 +14,16 @@ const handler = NextAuth({
       },
       async authorize(credentials) {
         await connectToDatabase();
+
         if (!credentials || !credentials.email || !credentials.password) {
           throw new Error('Invalid credentials');
         }
 
+        // Obsługa logowania przez email lub nazwę użytkownika
         const user = await UserRepository.getByEmailOrUsername(
           credentials.email,
         );
+
         if (!user) {
           throw new Error('No user found');
         }
@@ -29,6 +32,7 @@ const handler = NextAuth({
           credentials.password,
           user.password,
         );
+
         if (!isValidPassword) {
           throw new Error('Invalid password');
         }
@@ -65,6 +69,7 @@ const handler = NextAuth({
     },
   },
   secret: process.env.NEXTAUTH_SECRET,
-});
+};
 
+const handler = NextAuth(authOptions);
 export { handler as GET, handler as POST };
