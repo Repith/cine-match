@@ -44,33 +44,46 @@ const LoginForm = () => {
   };
 
   return (
-    <Card className="max-w-md mx-auto shadow-md">
+    <Card className="max-w-md w-full shadow-md border border-gray-200 dark:border-gray-700">
       <CardHeader>
-        <CardTitle>Login</CardTitle>
+        <CardTitle className="text-purple-600 dark:text-purple-400">
+          Login
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <Input
             type="text"
             placeholder="Username or Email"
+            className="
+              focus-visible:ring-2 focus-visible:ring-purple-600 
+              focus-visible:border-purple-600
+            "
             {...register('identifier', {
               required: 'Username or Email is required',
             })}
           />
           {errors.identifier && (
-            <p className="text-red-500">{errors.identifier.message}</p>
+            <p className="text-red-500 text-sm">{errors.identifier.message}</p>
           )}
 
           <Input
             type="password"
             placeholder="Password"
+            className="
+              focus-visible:ring-2 focus-visible:ring-purple-600 
+              focus-visible:border-purple-600
+            "
             {...register('password', { required: 'Password is required' })}
           />
           {errors.password && (
-            <p className="text-red-500">{errors.password.message}</p>
+            <p className="text-red-500 text-sm">{errors.password.message}</p>
           )}
 
-          <Button type="submit" className="w-full">
+          <Button
+            type="submit"
+            className="w-full bg-purple-600 hover:bg-purple-700"
+          >
             Login
           </Button>
         </form>

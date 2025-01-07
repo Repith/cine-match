@@ -1,10 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Loader from '../layout/Loader';
 import { useSession } from 'next-auth/react';
-import { useMoviesFetch } from '@/hooks/useMoviesFetch';
-import { useMovieActions } from '@/hooks/useMovieActions';
+import Loader from '../layout/Loader';
+
+import { useMoviesQuery } from '@/hooks/useMoviesQuery';
+import { useDislikeMovie, useLikeMovie } from '@/hooks/useMovieActions';
 
 export type Movie = {
   movieId: string;
@@ -17,20 +18,43 @@ export type Movie = {
 type MoviesProviderProps = {
   children: (
     movies: Movie[],
-    currentIndex: number,
     handleSwipe: (direction: 'left' | 'right', movieId: string) => void,
   ) => React.ReactNode;
 };
 
 const MoviesProvider = ({ children }: MoviesProviderProps) => {
   const { data: session } = useSession();
-  const { movies, isLoading, error, fetchMovies } = useMoviesFetch();
-  const { likeMovie, dislikeMovie } = useMovieActions();
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const { mutate: likeMovie } = useLikeMovie();
+  const { mutate: dislikeMovie } = useDislikeMovie();
+
+  const {
+    data: fetchedMovies,
+    isLoading,
+    error,
+    refetch: fetchMovies,
+  } = useMoviesQuery(session?.user.id || '');
+
+  const [movies, setMovies] = useState<Movie[]>([]);
 
   useEffect(() => {
-    fetchMovies();
-  }, []);
+    if (fetchedMovies && fetchedMovies.length > 0) {
+      setMovies((prev) => {
+        const newMovies = [...prev];
+        fetchedMovies.forEach((movie) => {
+          if (!newMovies.some((m) => m.movieId === movie.movieId)) {
+            newMovies.push(movie);
+          }
+        });
+        return newMovies;
+      });
+    }
+  }, [fetchedMovies]);
+
+  useEffect(() => {
+    if (movies.length === 0) {
+      fetchMovies();
+    }
+  }, [movies, fetchMovies]);
 
   const handleSwipe = (direction: 'left' | 'right', movieId: string) => {
     const userId = session?.user?.id;
@@ -39,35 +63,36 @@ const MoviesProvider = ({ children }: MoviesProviderProps) => {
       return;
     }
 
-    setCurrentIndex((prevIndex) => prevIndex + 1);
+    setMovies((prevMovies) => prevMovies.filter((m) => m.movieId !== movieId));
 
-    if (direction === 'right') {
-      likeMovie(movieId, userId);
-    } else {
-      dislikeMovie(movieId, userId);
+    if (movies.length <= 3) {
+      fetchMovies();
     }
 
-    if (currentIndex >= movies.length - 3) {
-      fetchMovies();
+    if (direction === 'right') {
+      likeMovie({ movieId, userId });
+    } else {
+      dislikeMovie({ movieId, userId });
     }
   };
 
   if (isLoading) return <Loader />;
 
-  if (error)
+  if (error) {
     return (
       <div className="flex flex-col items-center justify-center h-screen">
-        <p className="text-red-500 text-lg">{error}</p>
+        <p className="text-red-500 text-lg">{(error as Error).message}</p>
         <button
-          onClick={fetchMovies}
+          onClick={() => fetchMovies()}
           className="mt-4 px-4 py-2 bg-purple-600 text-white rounded"
         >
           Retry
         </button>
       </div>
     );
+  }
 
-  return <>{children(movies, currentIndex, handleSwipe)}</>;
+  return <>{children(movies, handleSwipe)}</>;
 };
 
 export default MoviesProvider;

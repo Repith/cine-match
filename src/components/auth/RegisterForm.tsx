@@ -60,15 +60,21 @@ const RegisterForm = () => {
   };
 
   return (
-    <Card className="max-w-md mx-auto shadow-md">
+    <Card className="max-w-md w-full shadow-md border border-gray-200 dark:border-gray-700">
       <CardHeader>
-        <CardTitle>Register</CardTitle>
+        <CardTitle className="text-purple-600 dark:text-purple-400">
+          Register
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <Input
             type="text"
             placeholder="Username"
+            className="
+              focus-visible:ring-2 focus-visible:ring-purple-600 
+              focus-visible:border-purple-600
+            "
             {...register('username', {
               required: 'Username is required',
               minLength: {
@@ -78,12 +84,16 @@ const RegisterForm = () => {
             })}
           />
           {errors.username && (
-            <p className="text-red-500">{errors.username.message}</p>
+            <p className="text-red-500 text-sm">{errors.username.message}</p>
           )}
 
           <Input
             type="email"
             placeholder="Email"
+            className="
+              focus-visible:ring-2 focus-visible:ring-purple-600 
+              focus-visible:border-purple-600
+            "
             {...register('email', {
               required: 'Email is required',
               pattern: {
@@ -93,12 +103,16 @@ const RegisterForm = () => {
             })}
           />
           {errors.email && (
-            <p className="text-red-500">{errors.email.message}</p>
+            <p className="text-red-500 text-sm">{errors.email.message}</p>
           )}
 
           <Input
             type="password"
             placeholder="Password"
+            className="
+              focus-visible:ring-2 focus-visible:ring-purple-600 
+              focus-visible:border-purple-600
+            "
             {...register('password', {
               required: 'Password is required',
               minLength: {
@@ -108,22 +122,31 @@ const RegisterForm = () => {
             })}
           />
           {errors.password && (
-            <p className="text-red-500">{errors.password.message}</p>
+            <p className="text-red-500 text-sm">{errors.password.message}</p>
           )}
 
           <Input
             type="password"
             placeholder="Confirm Password"
+            className="
+              focus-visible:ring-2 focus-visible:ring-purple-600 
+              focus-visible:border-purple-600
+            "
             {...register('confirmPassword', {
               validate: (value) =>
                 value === password || 'Passwords do not match',
             })}
           />
           {errors.confirmPassword && (
-            <p className="text-red-500">{errors.confirmPassword.message}</p>
+            <p className="text-red-500 text-sm">
+              {errors.confirmPassword.message}
+            </p>
           )}
 
-          <Button type="submit" className="w-full">
+          <Button
+            type="submit"
+            className="w-full bg-purple-600 hover:bg-purple-700"
+          >
             Register
           </Button>
         </form>

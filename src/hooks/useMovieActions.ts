@@ -1,23 +1,32 @@
+import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 
-export const useMovieActions = () => {
-  const likeMovie = async (movieId: string, userId: string) => {
-    try {
+export const useLikeMovie = () => {
+  return useMutation({
+    mutationKey: ['like_movie'],
+    mutationFn: async ({
+      movieId,
+      userId,
+    }: {
+      movieId: string;
+      userId: string;
+    }) => {
       await axios.post('/api/movies/like', { movieId, userId });
-      console.log(`Liked movieId: ${movieId}`);
-    } catch (err) {
-      console.error('Failed to like movie:', err);
-    }
-  };
+    },
+  });
+};
 
-  const dislikeMovie = async (movieId: string, userId: string) => {
-    try {
+export const useDislikeMovie = () => {
+  return useMutation({
+    mutationKey: ['dislike_movie'],
+    mutationFn: async ({
+      movieId,
+      userId,
+    }: {
+      movieId: string;
+      userId: string;
+    }) => {
       await axios.post('/api/movies/dislike', { movieId, userId });
-      console.log(`Disliked movieId: ${movieId}`);
-    } catch (err) {
-      console.error('Failed to dislike movie:', err);
-    }
-  };
-
-  return { likeMovie, dislikeMovie };
+    },
+  });
 };

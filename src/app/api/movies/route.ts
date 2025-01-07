@@ -1,37 +1,47 @@
 import connectToDatabase from '@/backend/MongoConnection';
 import Movie from '@/backend/database/models/Movie';
-import tmdbService from '@/backend/services/tmdb.service';
+import User from '@/backend/database/models/User';
 import { NextResponse } from 'next/server';
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
     await connectToDatabase();
 
-    const popularMovies = await tmdbService.getMoviesToSwipe();
+    const { searchParams } = new URL(req.url);
+    const userId = searchParams.get('userId');
+    const limit = parseInt(searchParams.get('limit') || '10', 10);
+    const offset = parseInt(searchParams.get('offset') || '0', 10);
 
-    const savedMovies = await Movie.find();
-    const savedMovieIds = savedMovies.map((movie) => movie.movieId);
+    if (!userId) {
+      return NextResponse.json(
+        { message: 'User ID is required' },
+        { status: 400 },
+      );
+    }
 
-    const newMovies = popularMovies.filter(
-      (movie: any) => !savedMovieIds.includes(String(movie.id)),
+    const user = await User.findById(userId).select(
+      'likedMovies dislikedMovies',
     );
+    if (!user) {
+      return NextResponse.json({ message: 'User not found' }, { status: 404 });
+    }
 
-    const moviesToSave = newMovies.map((movie: any) => ({
-      movieId: String(movie.id),
-      title: movie.title,
-      summary: movie.overview,
-      rating: movie.vote_average,
-      imageURL: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
-    }));
+    const excludedMovieIds = [
+      ...(user.likedMovies || []),
+      ...(user.dislikedMovies || []),
+    ];
 
-    await Movie.insertMany(moviesToSave);
+    const movies = await Movie.find({ movieId: { $nin: excludedMovieIds } })
+      .skip(offset)
+      .limit(limit)
+      .sort({ _id: -1 });
 
     return NextResponse.json({
-      message: 'Movies saved to MongoDB',
-      newMovies: moviesToSave,
+      message: 'Movies fetched successfully',
+      movies,
     });
   } catch (error) {
-    console.error('Error in movies endpoint:', error);
+    console.error('Error fetching movies:', error);
     return NextResponse.json(
       { message: 'Internal Server Error', error },
       { status: 500 },
