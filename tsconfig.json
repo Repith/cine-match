@@ -21,13 +21,12 @@
     "paths": {
       "@/*": ["./src/*"],
       "@/app/*": ["./app/*"],
-      "@/components/*": ["src/components/*"],
+      "@/components/*": ["./src/components/*"],
       "@/app/components/*": ["./src/app/components/*"],
       "@/hooks/*": ["./src/hooks/*"],
       "@/lib/*": ["./src/lib/*"],
       "@/backend/*": ["./src/backend/*"]
     },
-    "types": ["vitest/globals"]
   },
   "include": [
     "next-env.d.ts",

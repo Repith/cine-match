@@ -1,10 +1,11 @@
-import NextAuth, { NextAuthOptions } from 'next-auth';
+import NextAuth, { AuthOptions, User } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcrypt';
 import { UserRepository } from '@/backend/database/repositories/user.repository';
 import connectToDatabase from '@/backend/MongoConnection';
+import { JWT } from 'next-auth/jwt';
 
-export const authOptions: NextAuthOptions = {
+const authOptions: AuthOptions = {
   providers: [
     CredentialsProvider({
       name: 'Credentials',
@@ -14,16 +15,13 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         await connectToDatabase();
-
         if (!credentials || !credentials.email || !credentials.password) {
           throw new Error('Invalid credentials');
         }
 
-        // Obsługa logowania przez email lub nazwę użytkownika
         const user = await UserRepository.getByEmailOrUsername(
           credentials.email,
         );
-
         if (!user) {
           throw new Error('No user found');
         }
@@ -32,7 +30,6 @@ export const authOptions: NextAuthOptions = {
           credentials.password,
           user.password,
         );
-
         if (!isValidPassword) {
           throw new Error('Invalid password');
         }
@@ -49,7 +46,7 @@ export const authOptions: NextAuthOptions = {
     strategy: 'jwt',
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user }: { token: JWT; user?: User }) {
       if (user) {
         token.id = user.id;
         token.email = user.email;
@@ -57,19 +54,17 @@ export const authOptions: NextAuthOptions = {
       }
       return token;
     },
-    async session({ session, token }) {
-      if (token) {
-        session.user = {
-          id: token.id as string,
-          username: token.username as string,
-          email: token.email as string,
-        };
-      }
+    async session({ session, token }: { session: any; token: JWT }) {
+      session.user = {
+        id: token.id,
+        username: token.username,
+        email: token.email,
+      };
       return session;
     },
   },
   secret: process.env.NEXTAUTH_SECRET,
 };
 
-const handler = NextAuth(authOptions);
-export { handler as GET, handler as POST };
+export const GET = NextAuth(authOptions);
+export const POST = NextAuth(authOptions);
