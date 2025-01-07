@@ -3,8 +3,20 @@
 import { AnimatePresence } from 'framer-motion';
 import SwipeCard from './SwipeCard';
 import MoviesProvider from '@/components/providers/MovieProvider';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 const SwipeStack = () => {
+  const { status } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (status !== 'authenticated') {
+      router.push('/');
+    }
+  }, [status, router]);
+
   return (
     <MoviesProvider>
       {(movies, currentIndex, handleSwipe) => (

@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/useToast';
 import { useRouter } from 'next/navigation';
 import { useRegister } from '@/hooks/useRegister';
+import { signIn } from 'next-auth/react';
 
 type RegisterFormData = {
   username: string;
@@ -29,12 +30,27 @@ const RegisterForm = () => {
 
   const onSubmit = (data: RegisterFormData) => {
     mutate(data, {
-      onSuccess: () => {
+      onSuccess: async () => {
         toast({
           title: 'Registration successful',
           description: 'Welcome to CineMatch!',
         });
-        router.push('/');
+
+        const signInResult = await signIn('credentials', {
+          redirect: false,
+          email: data.email,
+          password: data.password,
+        });
+
+        if (signInResult?.error) {
+          toast({
+            title: 'Login failed',
+            description: signInResult.error,
+            variant: 'destructive',
+          });
+        } else {
+          router.push('/');
+        }
       },
       onError: (error: unknown) => {
         const message = (error as Error).message || 'Registration failed';
