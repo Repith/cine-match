@@ -31,7 +31,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${exo2.variable} ${robotoFlex.variable} antialiased`}
+        className={`${exo2.variable} ${robotoFlex.variable} antialiased  bg-gradient-to-t dark:from-purple-800 dark:via-purple-900 dark:to-purple-950`}
         suppressHydrationWarning
       >
         <QueryProvider>

@@ -19,6 +19,7 @@ import {
   Settings as SettingsIcon,
   LogOut,
   LogIn,
+  Clapperboard,
 } from 'lucide-react';
 
 import { ThemeToggle } from './ThemeToggle';
@@ -55,7 +56,10 @@ const Navbar = () => {
             text-purple-600 dark:text-purple-400
           "
         >
-          CineMatch
+          <div className="flex gap-2 items-center">
+            <Clapperboard />
+            <span>CineMatch</span>
+          </div>
         </Link>
 
         {/* Desktop Links */}
@@ -164,7 +168,10 @@ const Navbar = () => {
             text-purple-600 dark:text-purple-400
           "
         >
-          CineMatch
+          <div className="flex gap-2 items-center">
+            <Clapperboard />
+            <span>CineMatch</span>
+          </div>
         </Link>
       </div>
 

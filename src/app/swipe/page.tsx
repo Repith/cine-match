@@ -21,7 +21,7 @@ const SwipeStack = () => {
   return (
     <MoviesProvider>
       {(movies: Movie[], handleSwipe) => (
-        <main className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
+        <main className="min-h-screen flex items-center justify-center ">
           <div className="md:pt-4 relative w-80 h-[500px] sm:w-[450px] sm:h-[600px]">
             <AnimatePresence>
               {movies.slice(0, 3).map((movie, index) => (

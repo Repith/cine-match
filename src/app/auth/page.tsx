@@ -33,7 +33,6 @@ const AuthPage = () => {
       className="
         min-h-screen 
         flex items-center justify-center 
-        bg-gradient-to-t from-purple-800 via-purple-900 to-purple-950
         px-4
       "
     >
